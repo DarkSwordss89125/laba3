@@ -4,6 +4,8 @@
 #include <ctime>
 #include <sstream>
 #include <iomanip>
+#include <cstdlib>
+#include <cmath>
 
 // Интерфейс для датчиков
 class ISensor {
@@ -202,7 +204,6 @@ public:
         return *this;
     }
     
-    // Переопределение виртуальных функций
     virtual void turnOn() override {
         PoweredDevice::turnOn();
         if (mode == "off") {
@@ -224,17 +225,15 @@ public:
         return ss.str();
     }
     
-    // Переопределение функции с реализацией по умолчанию
+
     virtual std::string getDeviceInfo() const override {
         return PoweredDevice::getDeviceInfo() + " [Thermostat]";
     }
     
-    // Специфичные для Thermostat функции
     virtual double getPowerUsage() const override {
         if (!isOn || mode == "off") {
             return 0;
         }
-        // Потребление зависит от разницы температур
         double tempDiff = std::abs(targetTemperature - currentTemperature);
         return powerConsumption * (0.5 + tempDiff / 10.0);
     }
@@ -260,4 +259,87 @@ public:
     double getCurrentTemperature() const { return currentTemperature; }
     double getTargetTemperature() const { return targetTemperature; }
     std::string getMode() const { return mode; }
+};
+
+
+class SmartOutlet : public PoweredDevice, public ISensor {
+private:
+    bool outletOn;
+    double voltage;
+    double maxCurrent;
+    std::string location;
+    mutable int sensorCounter;
+    
+public:
+    SmartOutlet(const std::string& id, const std::string& name, 
+                double power, double maxCurrent = 16.0, const std::string& location = "living room")
+        : PoweredDevice(id, name, power), outletOn(false), 
+          voltage(220.0), maxCurrent(maxCurrent), location(location),
+          sensorCounter(0) {}
+    
+    SmartOutlet(const SmartOutlet& other)
+        : PoweredDevice(other), ISensor(other),
+          outletOn(other.outletOn), voltage(other.voltage),
+          maxCurrent(other.maxCurrent), location(other.location),
+          sensorCounter(other.sensorCounter) {}
+    
+    SmartOutlet& operator=(const SmartOutlet& other) {
+        if (this != &other) {
+            PoweredDevice::operator=(other);
+            outletOn = other.outletOn;
+            voltage = other.voltage;
+            maxCurrent = other.maxCurrent;
+            location = other.location;
+            sensorCounter = other.sensorCounter;
+        }
+        return *this;
+    }
+    
+    virtual double getCurrentVoltage() const override {
+        sensorCounter++;
+        return voltage + (std::sin(sensorCounter * 0.1) * 2.0) + ((std::rand() % 100) / 100.0);
+    }
+    
+    virtual std::string getSensorType() const override {
+        return "Voltage Sensor";
+    }
+    
+    virtual void turnOn() override {
+        PoweredDevice::turnOn();
+        outletOn = true;
+    }
+    
+    virtual void turnOff() override {
+        PoweredDevice::turnOff();
+        outletOn = false;
+    }
+    
+    virtual std::string getStatus() const override {
+        std::stringstream ss;
+        ss << "SmartOutlet " << deviceName << " is " << (isOn ? "ON" : "OFF")
+           << ", Outlet: " << (outletOn ? "active" : "inactive")
+           << ", Location: " << location
+           << ", Max Current: " << maxCurrent << "A"
+           << ", Power: " << powerConsumption << "W";
+        return ss.str();
+    }
+    
+    virtual std::string getDeviceInfo() const override {
+        return PoweredDevice::getDeviceInfo() + " [Smart Outlet with Sensor]";
+    }
+    virtual double getPowerUsage() const override {
+        if (!isOn || !outletOn) {
+            return 0;
+        }
+        return powerConsumption;
+    }
+    
+    // Специфичные методы для SmartOutlet
+    void toggleOutlet() {
+        outletOn = !outletOn;
+    }
+    
+    bool isOutletOn() const { return outletOn; }
+    double getMaxCurrent() const { return maxCurrent; }
+    std::string getLocation() const { return location; }
 };
