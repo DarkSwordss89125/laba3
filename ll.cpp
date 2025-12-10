@@ -7,7 +7,6 @@
 #include <cstdlib>
 #include <cmath>
 
-// Интерфейс для датчиков
 class ISensor {
 public:
     virtual ~ISensor() = default;
@@ -15,7 +14,7 @@ public:
     virtual std::string getSensorType() const = 0;
 };
 
-// Абстрактный базовый класс SmartDevice
+
 class SmartDevice {
 protected:
     std::string deviceId;
@@ -30,12 +29,12 @@ public:
     
     virtual ~SmartDevice() = default;
     
-    // Чисто виртуальные функции
+
     virtual void turnOn() = 0;
     virtual void turnOff() = 0;
     virtual std::string getStatus() const = 0;
     
-    // Виртуальная функция с реализацией по умолчанию
+ 
     virtual std::string getDeviceInfo() const {
         return "Device: " + deviceName + " (ID: " + deviceId + ")";
     }
@@ -44,27 +43,27 @@ public:
     std::string getId() const { return deviceId; }
     std::string getName() const { return deviceName; }
     
-    // Статический член для подсчета созданных устройств
+
     static int totalDevicesCreated;
     
-    // Статическая функция
+
     static int getTotalDevicesCreated() {
         return totalDevicesCreated;
     }
 };
 
-// Инициализация статического члена
+
 int SmartDevice::totalDevicesCreated = 0;
 
-// Промежуточный класс PoweredDevice
+
 class PoweredDevice : public SmartDevice {
 protected:
-    double powerConsumption; // в ваттах
+    double powerConsumption; 
     time_t lastTurnOnTime;
-    time_t totalOnTime; // в секундах
+    time_t totalOnTime; 
     
-    // Статический член для общего потребления энергии
-    static double totalEnergyConsumed; // в кВт·ч
+
+    static double totalEnergyConsumed; 
     
 public:
     PoweredDevice(const std::string& id, const std::string& name, double power)
@@ -73,7 +72,20 @@ public:
     
     virtual ~PoweredDevice() = default;
     
-    // Переопределение чисто виртуальных функций
+
+    virtual PoweredDevice& operator=(const PoweredDevice& other) {
+        if (this != &other) {
+            deviceId = other.deviceId;
+            deviceName = other.deviceName;
+            isOn = other.isOn;
+            powerConsumption = other.powerConsumption;
+            lastTurnOnTime = other.lastTurnOnTime;
+            totalOnTime = other.totalOnTime;
+        }
+        return *this;
+    }
+    
+
     virtual void turnOn() override {
         if (!isOn) {
             isOn = true;
@@ -88,40 +100,39 @@ public:
             time_t onDuration = currentTime - lastTurnOnTime;
             totalOnTime += onDuration;
             
-            // Рассчитываем потребленную энергию
-            double energy = (powerConsumption * onDuration) / 3600000.0; // кВт·ч
+
+            double energy = (powerConsumption * onDuration) / 3600000.0; 
             totalEnergyConsumed += energy;
         }
     }
     
-    // Виртуальная функция для получения информации о потреблении
+
     virtual double getPowerUsage() const {
         return isOn ? powerConsumption : 0;
     }
     
-    // Чисто виртуальная функция из SmartDevice
+
     virtual std::string getStatus() const override = 0;
     
     double getTotalOnTime() const { return totalOnTime; }
     
-    // Статическая функция для получения общего потребления
     static double getTotalEnergyConsumed() {
         return totalEnergyConsumed;
     }
     
-    // Статическая функция для сброса статистики
+
     static void resetEnergyConsumption() {
         totalEnergyConsumed = 0;
     }
 };
 
-// Инициализация статического члена
+
 double PoweredDevice::totalEnergyConsumed = 0.0;
 
-// Класс LightBulb
+
 class LightBulb : public PoweredDevice {
 private:
-    int brightness; // 0-100%
+    int brightness; 
     std::string color;
     
 public:
@@ -133,21 +144,21 @@ public:
         }
     }
     
-    // Конструктор копирования
+
     LightBulb(const LightBulb& other)
         : PoweredDevice(other), brightness(other.brightness), color(other.color) {}
     
-    // Оператор присваивания
+
     LightBulb& operator=(const LightBulb& other) {
         if (this != &other) {
-            PoweredDevice::operator=(other);
+            PoweredDevice::operator=(other);  
             brightness = other.brightness;
             color = other.color;
         }
         return *this;
     }
     
-    // Переопределение виртуальных функций
+
     virtual std::string getStatus() const override {
         std::stringstream ss;
         ss << "LightBulb " << deviceName << " is " << (isOn ? "ON" : "OFF")
@@ -156,7 +167,7 @@ public:
         return ss.str();
     }
     
-    // Переопределение функции с реализацией по умолчанию
+
     virtual std::string getDeviceInfo() const override {
         return PoweredDevice::getDeviceInfo() + " [Light Bulb]";
     }
@@ -175,12 +186,12 @@ public:
     std::string getColor() const { return color; }
 };
 
-// Класс Thermostat
+
 class Thermostat : public PoweredDevice {
 private:
     double currentTemperature;
     double targetTemperature;
-    std::string mode; // "heating", "cooling", "off"
+    std::string mode; 
     
 public:
     Thermostat(const std::string& id, const std::string& name, 
@@ -188,15 +199,13 @@ public:
         : PoweredDevice(id, name, power), currentTemperature(initialTemp),
           targetTemperature(initialTemp), mode("off") {}
     
-    // Конструктор копирования
     Thermostat(const Thermostat& other)
         : PoweredDevice(other), currentTemperature(other.currentTemperature),
           targetTemperature(other.targetTemperature), mode(other.mode) {}
     
-    // Оператор присваивания
     Thermostat& operator=(const Thermostat& other) {
         if (this != &other) {
-            PoweredDevice::operator=(other);
+            PoweredDevice::operator=(other);  
             currentTemperature = other.currentTemperature;
             targetTemperature = other.targetTemperature;
             mode = other.mode;
@@ -225,7 +234,6 @@ public:
         return ss.str();
     }
     
-
     virtual std::string getDeviceInfo() const override {
         return PoweredDevice::getDeviceInfo() + " [Thermostat]";
     }
@@ -261,13 +269,13 @@ public:
     std::string getMode() const { return mode; }
 };
 
-
 class SmartOutlet : public PoweredDevice, public ISensor {
 private:
     bool outletOn;
     double voltage;
     double maxCurrent;
     std::string location;
+    
     mutable int sensorCounter;
     
 public:
@@ -283,9 +291,10 @@ public:
           maxCurrent(other.maxCurrent), location(other.location),
           sensorCounter(other.sensorCounter) {}
     
+
     SmartOutlet& operator=(const SmartOutlet& other) {
         if (this != &other) {
-            PoweredDevice::operator=(other);
+            PoweredDevice::operator=(other);  
             outletOn = other.outletOn;
             voltage = other.voltage;
             maxCurrent = other.maxCurrent;
@@ -294,7 +303,7 @@ public:
         }
         return *this;
     }
-    
+
     virtual double getCurrentVoltage() const override {
         sensorCounter++;
         return voltage + (std::sin(sensorCounter * 0.1) * 2.0) + ((std::rand() % 100) / 100.0);
@@ -323,7 +332,6 @@ public:
            << ", Power: " << powerConsumption << "W";
         return ss.str();
     }
-    
     virtual std::string getDeviceInfo() const override {
         return PoweredDevice::getDeviceInfo() + " [Smart Outlet with Sensor]";
     }
@@ -333,8 +341,6 @@ public:
         }
         return powerConsumption;
     }
-    
-    // Специфичные методы для SmartOutlet
     void toggleOutlet() {
         outletOn = !outletOn;
     }
