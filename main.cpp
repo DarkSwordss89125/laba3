@@ -5,9 +5,9 @@
 void polymorphism() {
     std::cout << "\nPolimorfnyy vyzov\n";
     
-    LightBulb lamp("LB2", "Lampochka", 60);
-    Thermostat thermo("TH2", "Termostat", 1000);
-    SmartOutlet outlet("SO2", "Rozetka", 5);
+    LightBulb lamp("LB2", "Lampochka", 20000);
+    Thermostat thermo("TH2", "Termostat", 20000);
+    SmartOutlet outlet("SO2", "Rozetka", 20000);
     
     SmartDevice* devices[] = {&lamp, &thermo, &outlet};
     
