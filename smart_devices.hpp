@@ -343,7 +343,7 @@ double PoweredDevice::totalEnergyConsumedAll = 0.0;
 PoweredDevice::PoweredDevice(const std::string& id, const std::string& name, double power)
     : SmartDevice(id, name), powerConsumption(power), lastTurnOnTime(0), totalOnTime(0) {
     if (power <= 0) {
-        throw std::invalid_argument("Power consumption must be positive");
+        throw std::invalid_argument("Moschnost' dolznha byt' polozhitel'noy");
     }
 }
 
