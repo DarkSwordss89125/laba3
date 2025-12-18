@@ -31,9 +31,9 @@ void staticMembers() {
     double initialEnergy = PoweredDevice::getTotalEnergyConsumedAll();
     
     {
-        LightBulb lamp("LB3", "Test lampa", 60);
-        Thermostat thermo("TH3", "Test termostat", 800);
-        SmartOutlet outlet("SO3", "Test rozetka", 5);
+        LightBulb lamp("LB3", "Test lampa", 20000);
+        Thermostat thermo("TH3", "Test termostat", 20000);
+        SmartOutlet outlet("SO3", "Test rozetka", 20000);
         
         lamp.turnOn();
         thermo.turnOn();
@@ -53,11 +53,11 @@ void staticMembers() {
 void copyAndAssignment() {
     std::cout << "\nKopirovanie i prisvaivanie\n";
     
-    LightBulb lamp1("LB4", "Lampochka 1", 60, 75, "belyy");
+    LightBulb lamp1("LB4", "Lampochka 1", 20000, 75, "belyy");
     lamp1.turnOn();
     
     LightBulb lamp2 = lamp1;
-    LightBulb lamp3("LB4_temp", "Temp", 40);
+    LightBulb lamp3("LB4_temp", "Temp", 20000);
     lamp3 = lamp1;
     
     std::cout << "Original ID: " << lamp1.getId() << "\n";
@@ -70,14 +70,14 @@ void exceptions() {
     
     std::cout << "1. Sozdayu lampochku s yarkost'yu 150% (dopustimo 0-100%):\n";
     try {
-        LightBulb lamp("LB5", "Test lampa", 60, 150, "belyy");
+        LightBulb lamp("LB5", "Test lampa", 20000, 150, "belyy");
         std::cout << "  Lampochka sozdana, yarkost: " << lamp.getBrightness() << "%\n";
     } catch (const std::invalid_argument& e) {
         std::cout << "  Vozniklo isklyuchenie: " << e.what() << "\n";
     }
     
     std::cout << "\n2. Sozdayu lampochku s yarkost'yu 50%, zatem pytayus' ustanovit' 150%:\n";
-    LightBulb lamp("LB5", "Test lampa", 60, 50);
+    LightBulb lamp("LB5", "Test lampa", 20000, 50);
     std::cout << "  Nachal'naya yarkost': " << lamp.getBrightness() << "%\n";
     
     try {
@@ -92,7 +92,7 @@ void exceptions() {
 void multipleInheritance() {
     std::cout << "\nMnozhestvennoe nasledovanie\n";
     
-    SmartOutlet outlet("SO6", "Rozetka s datchikom protechki", 5);
+    SmartOutlet outlet("SO6", "Rozetka s datchikom protechki", 20000);
     outlet.turnOn();
     
     ISensor* sensor = &outlet;
@@ -116,9 +116,9 @@ void createDevices() {
         }
     }
     
-    devices[0] = new LightBulb("LB1", "Lampochka", 60, 75, "teplyy belyy");
-    devices[1] = new Thermostat("TH1", "Termostat", 1000, 22.5);
-    devices[2] = new SmartOutlet("SO1", "Rozetka s datchikom protechki", 5);
+    devices[0] = new LightBulb("LB1", "Lampochka", 20000, 75, "teplyy belyy");
+    devices[1] = new Thermostat("TH1", "Termostat", 20000, 22.5);
+    devices[2] = new SmartOutlet("SO1", "Rozetka s datchikom protechki", 20000);
     
     devicesCreated = true;
     
